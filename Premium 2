@@ -1,0 +1,520 @@
+--[[
+  PREMIUM HUB(No Key) - VERSI XSO
+  UI 65% layar, transparan hitam, teks putih.
+  Sidebar: Home (🏠) dan Tanaman (🌱)
+  Menu Home: tampilkan username dan label "Unlimited Owner"
+  Menu Tanaman: submenu Shop dan Sell (Sell kosong)
+  Shop: tab Seed dan Gear (Gear kosong)
+  Seed: daftar scroll dengan tombol "Beli" per item, dan switch "Buy All" auto-loop
+--]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+-- ======================== KONFIGURASI SEED ========================
+local seedList = {
+    -- Carrot
+    {
+        name = "Carrot",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\006Carrot") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Strawberry
+    {
+        name = "Strawberry",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\nStrawberry") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Blueberry
+    {
+        name = "Blueberry",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\tBlueberry") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Tulip
+    {
+        name = "Tulip",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\005Tulip") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Tomato
+    {
+        name = "Tomato",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\006Tomato") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Apple
+    {
+        name = "Apple",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\005Apple") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Bamboo
+    {
+        name = "Bamboo",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\006Bamboo") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+    -- Corn
+    {
+        name = "Corn",
+        buyRemote = function()
+            local args = { buffer.fromstring("{\000\004Corn") }
+            ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        end
+    },
+}
+
+-- ======================== BUAT GUI ========================
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PremiumHub"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Tombol "+" untuk memunculkan kembali (akan muncul saat minimize)
+local plusButton = Instance.new("TextButton")
+plusButton.Name = "PlusButton"
+plusButton.Size = UDim2.new(0, 50, 0, 50)
+plusButton.Position = UDim2.new(1, -60, 0, 10)
+plusButton.Text = "+"
+plusButton.TextColor3 = Color3.new(1,1,1)
+plusButton.BackgroundColor3 = Color3.new(0.1,0.1,0.1)
+plusButton.BackgroundTransparency = 0.5
+plusButton.Visible = false
+plusButton.Parent = screenGui
+
+-- Frame utama (65% layar)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0.65, 0, 0.65, 0)
+mainFrame.Position = UDim2.new(0.175, 0, 0.175, 0)
+mainFrame.BackgroundColor3 = Color3.new(0,0,0)
+mainFrame.BackgroundTransparency = 0.35
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- ===== Title Bar =====
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 35)
+titleBar.BackgroundColor3 = Color3.new(0.1,0.1,0.1)
+titleBar.BackgroundTransparency = 0.2
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0.5, 0, 1, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Premium Hub"
+titleLabel.TextColor3 = Color3.new(1,1,1)
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.Parent = titleBar
+
+-- Tombol Minimize (-)
+local minButton = Instance.new("TextButton")
+minButton.Name = "MinButton"
+minButton.Size = UDim2.new(0, 30, 0, 30)
+minButton.Position = UDim2.new(1, -70, 0, 2.5)
+minButton.Text = "-"
+minButton.TextColor3 = Color3.new(1,1,1)
+minButton.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+minButton.BackgroundTransparency = 0.5
+minButton.BorderSizePixel = 0
+minButton.Parent = titleBar
+
+-- Tombol Close (X)
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 2.5)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.new(1,1,1)
+closeButton.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+closeButton.BackgroundTransparency = 0.5
+closeButton.BorderSizePixel = 0
+closeButton.Parent = titleBar
+
+-- ===== Konten Utama =====
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- ===== Sidebar (kiri) =====
+local sidebar = Instance.new("Frame")
+sidebar.Name = "Sidebar"
+sidebar.Size = UDim2.new(0.2, 0, 1, 0)
+sidebar.BackgroundColor3 = Color3.new(0.05,0.05,0.05)
+sidebar.BackgroundTransparency = 0.3
+sidebar.BorderSizePixel = 0
+sidebar.Parent = contentFrame
+
+-- Tombol Home
+local homeBtn = Instance.new("TextButton")
+homeBtn.Name = "HomeBtn"
+homeBtn.Size = UDim2.new(1, 0, 0, 40)
+homeBtn.Position = UDim2.new(0, 0, 0.1, 0)
+homeBtn.Text = "🏠 Home"
+homeBtn.TextColor3 = Color3.new(1,1,1)
+homeBtn.TextSize = 16
+homeBtn.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+homeBtn.BackgroundTransparency = 0.5
+homeBtn.BorderSizePixel = 0
+homeBtn.Parent = sidebar
+
+-- Tombol Tanaman
+local plantBtn = Instance.new("TextButton")
+plantBtn.Name = "PlantBtn"
+plantBtn.Size = UDim2.new(1, 0, 0, 40)
+plantBtn.Position = UDim2.new(0, 0, 0.25, 0)
+plantBtn.Text = "🌱 Tanaman"
+plantBtn.TextColor3 = Color3.new(1,1,1)
+plantBtn.TextSize = 16
+plantBtn.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+plantBtn.BackgroundTransparency = 0.5
+plantBtn.BorderSizePixel = 0
+plantBtn.Parent = sidebar
+
+-- ===== Area Konten (di sebelah kanan sidebar) =====
+local rightArea = Instance.new("Frame")
+rightArea.Name = "RightArea"
+rightArea.Size = UDim2.new(0.8, 0, 1, 0)
+rightArea.Position = UDim2.new(0.2, 0, 0, 0)
+rightArea.BackgroundTransparency = 1
+rightArea.Parent = contentFrame
+
+-- Kontainer untuk setiap halaman
+local homeContainer = Instance.new("Frame")
+homeContainer.Name = "HomeContainer"
+homeContainer.Size = UDim2.new(1, 0, 1, 0)
+homeContainer.BackgroundTransparency = 1
+homeContainer.Parent = rightArea
+
+local plantContainer = Instance.new("Frame")
+plantContainer.Name = "PlantContainer"
+plantContainer.Size = UDim2.new(1, 0, 1, 0)
+plantContainer.BackgroundTransparency = 1
+plantContainer.Visible = false
+plantContainer.Parent = rightArea
+
+-- ===== Isi Home =====
+local usernameLabel = Instance.new("TextLabel")
+usernameLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+usernameLabel.Position = UDim2.new(0.1, 0, 0.1, 0)
+usernameLabel.BackgroundTransparency = 1
+usernameLabel.Text = "Username Roblox: " .. player.Name
+usernameLabel.TextColor3 = Color3.new(1,1,1)
+usernameLabel.TextSize = 20
+usernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+usernameLabel.Parent = homeContainer
+
+local ownerLabel = Instance.new("TextLabel")
+ownerLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+ownerLabel.Position = UDim2.new(0.1, 0, 0.35, 0)
+ownerLabel.BackgroundTransparency = 1
+ownerLabel.Text = "Unlimited Owner: XSO"
+ownerLabel.TextColor3 = Color3.new(1,1,1)
+ownerLabel.TextSize = 20
+ownerLabel.TextXAlignment = Enum.TextXAlignment.Left
+ownerLabel.Parent = homeContainer
+
+-- ===== Isi Tanaman =====
+local shopBtn = Instance.new("TextButton")
+shopBtn.Name = "ShopBtn"
+shopBtn.Size = UDim2.new(0.3, 0, 0.08, 0)
+shopBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
+shopBtn.Text = "Shop"
+shopBtn.TextColor3 = Color3.new(1,1,1)
+shopBtn.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+shopBtn.BackgroundTransparency = 0.3
+shopBtn.BorderSizePixel = 0
+shopBtn.Parent = plantContainer
+
+local sellBtn = Instance.new("TextButton")
+sellBtn.Name = "SellBtn"
+sellBtn.Size = UDim2.new(0.3, 0, 0.08, 0)
+sellBtn.Position = UDim2.new(0.4, 0, 0.05, 0)
+sellBtn.Text = "Sell"
+sellBtn.TextColor3 = Color3.new(1,1,1)
+sellBtn.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
+sellBtn.BackgroundTransparency = 0.3
+sellBtn.BorderSizePixel = 0
+sellBtn.Parent = plantContainer
+
+local subContent = Instance.new("Frame")
+subContent.Name = "SubContent"
+subContent.Size = UDim2.new(1, 0, 1, -0.15)
+subContent.Position = UDim2.new(0, 0, 0.15, 0)
+subContent.BackgroundTransparency = 1
+subContent.Parent = plantContainer
+
+-- Konten Shop
+local shopContent = Instance.new("Frame")
+shopContent.Name = "ShopContent"
+shopContent.Size = UDim2.new(1, 0, 1, 0)
+shopContent.BackgroundTransparency = 1
+shopContent.Parent = subContent
+
+-- Tab Seed dan Gear
+local seedTab = Instance.new("TextButton")
+seedTab.Name = "SeedTab"
+seedTab.Size = UDim2.new(0.2, 0, 0.08, 0)
+seedTab.Position = UDim2.new(0.05, 0, 0, 0)
+seedTab.Text = "Seed"
+seedTab.TextColor3 = Color3.new(1,1,1)
+seedTab.BackgroundColor3 = Color3.new(0.3,0.3,0.3)
+seedTab.BackgroundTransparency = 0.2
+seedTab.BorderSizePixel = 0
+seedTab.Parent = shopContent
+
+local gearTab = Instance.new("TextButton")
+gearTab.Name = "GearTab"
+gearTab.Size = UDim2.new(0.2, 0, 0.08, 0)
+gearTab.Position = UDim2.new(0.3, 0, 0, 0)
+gearTab.Text = "Gear"
+gearTab.TextColor3 = Color3.new(1,1,1)
+gearTab.BackgroundColor3 = Color3.new(0.3,0.3,0.3)
+gearTab.BackgroundTransparency = 0.2
+gearTab.BorderSizePixel = 0
+gearTab.Parent = shopContent
+
+-- Container Seed dan Gear
+local seedContainer = Instance.new("Frame")
+seedContainer.Name = "SeedContainer"
+seedContainer.Size = UDim2.new(1, 0, 1, -0.1)
+seedContainer.Position = UDim2.new(0, 0, 0.1, 0)
+seedContainer.BackgroundTransparency = 1
+seedContainer.Parent = shopContent
+
+local gearContainer = Instance.new("Frame")
+gearContainer.Name = "GearContainer"
+gearContainer.Size = UDim2.new(1, 0, 1, -0.1)
+gearContainer.Position = UDim2.new(0, 0, 0.1, 0)
+gearContainer.BackgroundTransparency = 1
+gearContainer.Visible = false
+gearContainer.Parent = shopContent
+
+-- Isi Gear (kosong)
+local gearEmpty = Instance.new("TextLabel")
+gearEmpty.Size = UDim2.new(1, 0, 1, 0)
+gearEmpty.BackgroundTransparency = 1
+gearEmpty.Text = "Kosong"
+gearEmpty.TextColor3 = Color3.new(1,1,1)
+gearEmpty.TextSize = 24
+gearEmpty.Parent = gearContainer
+
+-- ===== SWITCH BUY ALL (Auto-Loop) =====
+local buyAllSwitch = Instance.new("TextButton")
+buyAllSwitch.Name = "BuyAllSwitch"
+buyAllSwitch.Size = UDim2.new(0.15, 0, 0.08, 0)
+buyAllSwitch.Position = UDim2.new(0.8, 0, 0.01, 0)
+buyAllSwitch.Text = "OFF"
+buyAllSwitch.TextColor3 = Color3.new(1,1,1)
+buyAllSwitch.TextSize = 14
+buyAllSwitch.BackgroundColor3 = Color3.new(0.5,0.5,0.5)
+buyAllSwitch.BorderSizePixel = 0
+buyAllSwitch.Parent = seedContainer
+
+local switchOn = false
+local loopConnection = nil
+
+local function stopAutoBuy()
+    if loopConnection then
+        loopConnection:Disconnect()
+        loopConnection = nil
+    end
+end
+
+local function startAutoBuy()
+    stopAutoBuy()
+    loopConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        for _, seed in ipairs(seedList) do
+            pcall(seed.buyRemote)
+        end
+        task.wait(0.5)
+    end)
+end
+
+local function updateSwitch()
+    if switchOn then
+        buyAllSwitch.Text = "ON"
+        buyAllSwitch.BackgroundColor3 = Color3.new(0.2,0.8,0.2)
+        startAutoBuy()
+    else
+        buyAllSwitch.Text = "OFF"
+        buyAllSwitch.BackgroundColor3 = Color3.new(0.5,0.5,0.5)
+        stopAutoBuy()
+    end
+end
+
+buyAllSwitch.MouseButton1Click:Connect(function()
+    switchOn = not switchOn
+    updateSwitch()
+end)
+updateSwitch()
+
+-- ScrollingFrame untuk daftar seed
+local seedScroll = Instance.new("ScrollingFrame")
+seedScroll.Name = "SeedScroll"
+seedScroll.Size = UDim2.new(1, 0, 0.9, 0)
+seedScroll.Position = UDim2.new(0, 0, 0.1, 0)
+seedScroll.BackgroundColor3 = Color3.new(0.1,0.1,0.1)
+seedScroll.BackgroundTransparency = 0.5
+seedScroll.BorderSizePixel = 0
+seedScroll.ScrollBarThickness = 8
+seedScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+seedScroll.Parent = seedContainer
+
+-- Fungsi untuk membuat item seed
+local function createSeedItem(parent, seedName, index)
+    local item = Instance.new("Frame")
+    item.Size = UDim2.new(1, 0, 0, 40)
+    item.Position = UDim2.new(0, 0, 0, (index-1)*45)
+    item.BackgroundColor3 = Color3.new(0.15,0.15,0.15)
+    item.BackgroundTransparency = 0.5
+    item.BorderSizePixel = 0
+    item.Parent = parent
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(0.6, 0, 1, 0)
+    nameLabel.Position = UDim2.new(0, 5, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = seedName
+    nameLabel.TextColor3 = Color3.new(1,1,1)
+    nameLabel.TextSize = 18
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = item
+
+    local buyBtn = Instance.new("TextButton")
+    buyBtn.Size = UDim2.new(0.15, 0, 0.7, 0)
+    buyBtn.Position = UDim2.new(0.8, 0, 0.15, 0)
+    buyBtn.Text = "Beli"
+    buyBtn.TextColor3 = Color3.new(1,1,1)
+    buyBtn.BackgroundColor3 = Color3.new(0.2,0.5,0.2)
+    buyBtn.BackgroundTransparency = 0.3
+    buyBtn.BorderSizePixel = 0
+    buyBtn.Parent = item
+
+    buyBtn.MouseButton1Click:Connect(function()
+        for _, seed in ipairs(seedList) do
+            if seed.name == seedName then
+                pcall(seed.buyRemote)
+                break
+            end
+        end
+    end)
+end
+
+-- Isi seedScroll
+for i, seed in ipairs(seedList) do
+    createSeedItem(seedScroll, seed.name, i)
+end
+local count = #seedList
+seedScroll.CanvasSize = UDim2.new(0, 0, 0, count * 45 + 10)
+
+-- Konten Sell (kosong)
+local sellContent = Instance.new("Frame")
+sellContent.Name = "SellContent"
+sellContent.Size = UDim2.new(1, 0, 1, 0)
+sellContent.BackgroundTransparency = 1
+sellContent.Visible = false
+sellContent.Parent = subContent
+
+local sellEmpty = Instance.new("TextLabel")
+sellEmpty.Size = UDim2.new(1, 0, 1, 0)
+sellEmpty.BackgroundTransparency = 1
+sellEmpty.Text = "Kosong (belum ada remote)"
+sellEmpty.TextColor3 = Color3.new(1,1,1)
+sellEmpty.TextSize = 24
+sellEmpty.Parent = sellContent
+
+-- ===== LOGIKA NAVIGASI =====
+local function showHome()
+    homeContainer.Visible = true
+    plantContainer.Visible = false
+end
+
+local function showPlant()
+    homeContainer.Visible = false
+    plantContainer.Visible = true
+end
+
+homeBtn.MouseButton1Click:Connect(showHome)
+plantBtn.MouseButton1Click:Connect(showPlant)
+
+local function showShop()
+    shopContent.Visible = true
+    sellContent.Visible = false
+end
+
+local function showSell()
+    shopContent.Visible = false
+    sellContent.Visible = true
+end
+
+shopBtn.MouseButton1Click:Connect(showShop)
+sellBtn.MouseButton1Click:Connect(showSell)
+
+local function showSeed()
+    seedContainer.Visible = true
+    gearContainer.Visible = false
+end
+
+local function showGear()
+    seedContainer.Visible = false
+    gearContainer.Visible = true
+end
+
+seedTab.MouseButton1Click:Connect(showSeed)
+gearTab.MouseButton1Click:Connect(showGear)
+
+-- Default tampilan
+showHome()
+showShop()
+showSeed()
+
+-- ===== FUNGSI MINIMIZE & CLOSE =====
+local function minimize()
+    mainFrame.Visible = false
+    plusButton.Visible = true
+end
+
+local function restore()
+    mainFrame.Visible = true
+    plusButton.Visible = false
+end
+
+minButton.MouseButton1Click:Connect(function()
+    if mainFrame.Visible then
+        minimize()
+    else
+        restore()
+    end
+end)
+
+plusButton.MouseButton1Click:Connect(function()
+    restore()
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+plusButton.Visible = false
