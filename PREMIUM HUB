@@ -385,7 +385,7 @@ end
 buildItemList(seedContainer, seedList, "Seed")
 buildItemList(gearContainer, gearList, "Gear")
 
--- ===== Konten Sell (kosong) =====
+-- ===== TAB SELL (AUTO SELL INVENTORY) =====
 local sellContent = Instance.new("Frame")
 sellContent.Name = "SellContent"
 sellContent.Size = UDim2.new(1, 0, 1, 0)
@@ -393,13 +393,87 @@ sellContent.BackgroundTransparency = 1
 sellContent.Visible = false
 sellContent.Parent = subContent
 
-local sellEmpty = Instance.new("TextLabel")
-sellEmpty.Size = UDim2.new(1, 0, 1, 0)
-sellEmpty.BackgroundTransparency = 1
-sellEmpty.Text = "Kosong (belum ada remote)"
-sellEmpty.TextColor3 = Color3.new(1,1,1)
-sellEmpty.TextSize = 24
-sellEmpty.Parent = sellContent
+-- Remote Auto Sell
+local function autoSell()
+    local args = { buffer.fromstring("\187\000&") }
+    ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+end
+
+-- Switch Auto Sell (ON/OFF)
+local sellSwitch = Instance.new("TextButton")
+sellSwitch.Name = "SellSwitch"
+sellSwitch.Size = UDim2.new(0.15, 0, 0.08, 0)
+sellSwitch.Position = UDim2.new(0.8, 0, 0.01, 0) -- pojok kanan atas
+sellSwitch.Text = "OFF"
+sellSwitch.TextColor3 = Color3.new(1,1,1)
+sellSwitch.TextSize = 14
+sellSwitch.BackgroundColor3 = Color3.new(0.5,0.5,0.5)
+sellSwitch.BorderSizePixel = 0
+sellSwitch.Parent = sellContent
+
+-- Label "Auto Sell Inventory"
+local sellLabel = Instance.new("TextLabel")
+sellLabel.Size = UDim2.new(0.6, 0, 0.2, 0)
+sellLabel.Position = UDim2.new(0.05, 0, 0.1, 0)
+sellLabel.BackgroundTransparency = 1
+sellLabel.Text = "Auto Sell Inventory"
+sellLabel.TextColor3 = Color3.new(1,1,1)
+sellLabel.TextSize = 22
+sellLabel.TextXAlignment = Enum.TextXAlignment.Left
+sellLabel.Parent = sellContent
+
+-- Status label (opsional)
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0.4, 0, 0.15, 0)
+statusLabel.Position = UDim2.new(0.05, 0, 0.35, 0)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Status: OFF"
+statusLabel.TextColor3 = Color3.new(0.7,0.7,0.7)
+statusLabel.TextSize = 16
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.Parent = sellContent
+
+-- Logika switch
+local sellSwitchOn = false
+local sellLoopConnection = nil
+
+local function stopSellLoop()
+    if sellLoopConnection then
+        sellLoopConnection:Disconnect()
+        sellLoopConnection = nil
+    end
+end
+
+local function startSellLoop()
+    stopSellLoop()
+    sellLoopConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        pcall(autoSell)
+        task.wait(5) -- jeda 5 detik, sesuaikan
+    end)
+end
+
+local function updateSellSwitch()
+    if sellSwitchOn then
+        sellSwitch.Text = "ON"
+        sellSwitch.BackgroundColor3 = Color3.new(0.2,0.8,0.2)
+        statusLabel.Text = "Status: ON"
+        statusLabel.TextColor3 = Color3.new(0.2,0.8,0.2)
+        startSellLoop()
+    else
+        sellSwitch.Text = "OFF"
+        sellSwitch.BackgroundColor3 = Color3.new(0.5,0.5,0.5)
+        statusLabel.Text = "Status: OFF"
+        statusLabel.TextColor3 = Color3.new(0.7,0.7,0.7)
+        stopSellLoop()
+    end
+end
+
+sellSwitch.MouseButton1Click:Connect(function()
+    sellSwitchOn = not sellSwitchOn
+    updateSellSwitch()
+end)
+updateSellSwitch()
+
 
 -- ===== LOGIKA NAVIGASI =====
 local function showHome()
