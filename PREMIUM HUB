@@ -398,7 +398,7 @@ sellContent.Parent = subContent
 
 -- Remote Auto Sell
 local function autoSell()
-    local args = { buffer.fromstring("\187\000&") }
+    local args = { buffer.fromstring("\188\000&") }
     ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
 end
 
