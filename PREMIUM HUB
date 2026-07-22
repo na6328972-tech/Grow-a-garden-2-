@@ -34,6 +34,7 @@ local gearList = {
     { name = "Legendary Sprinkler", buyRemote = function() local args = { buffer.fromstring("\136\000\019Legendary Sprinkler") } ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args)) end },
     { name = "Super Sprinkler",     buyRemote = function() local args = { buffer.fromstring("\136\000\015Super Sprinkler") } ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args)) end },
     { name = "Common Sprinkler",    buyRemote = function() local args = { buffer.fromstring("\136\000\016Common Sprinkler") } ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Paket"):WaitForChild("RemoteEvent"):FireServer(unpack(args)) end },
+    { name = "Basic Pot",           buyRemote = function() local args = { buffer.fromstring("\136\000\tBasic Pot") } ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args)) end },
 }
 
 -- ======================== BUAT GUI ========================
